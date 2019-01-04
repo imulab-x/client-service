@@ -1,0 +1,43 @@
+---
+kind: pipeline
+name: client-service-pipeline
+
+steps:
+  - name: "notify start"
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook_client-service
+      channel: client-service
+      template: >
+        Build {{build.number}} started at {{build.started}}. View it at {{build.link}}
+  - name: "unit, build, package, publish"
+    image: davidiamyou/open-jdk-8:latest
+    commands:
+      - ./gradlew test
+      - ./gradlew build
+      - ./gradlew shadowJar
+      - printf "latest," > .tags
+      - ./gradlew properties -q | grep "version:" | awk '{print $2}' | cat >> .tags
+  - name: "docker"
+    image: plugins/docker
+    settings:
+      repo: registry.imulab.io/astrea/client-service
+      registry: registry.imulab.io
+      insecure: true
+  - name: "notify"
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook_client-service
+      channel: client-service
+      template: >
+        {{#success build.status}}
+          Build {{build.number}} succeeded! View at https://registry.imulab.io/v2/astrea/discovery-service/tags/list
+        {{else}}
+          Build {{build.number}} failed! Please fix me at {{build.link}}!
+        {{/success}}
+    when:
+      status:
+        - success
+        - failure
