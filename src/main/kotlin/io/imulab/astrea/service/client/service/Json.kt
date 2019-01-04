@@ -5,18 +5,24 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.imulab.astrea.sdk.client.AstreaClient
 import io.imulab.astrea.sdk.client.DefaultClient
+import io.imulab.astrea.sdk.oauth.reserved.AuthenticationMethod
+import io.imulab.astrea.sdk.oauth.reserved.ClientType
+import io.imulab.astrea.sdk.oauth.token.JwtSigningAlgorithm
+import io.imulab.astrea.sdk.oidc.reserved.ApplicationType
+import io.imulab.astrea.sdk.oidc.reserved.JweContentEncodingAlgorithm
+import io.imulab.astrea.sdk.oidc.reserved.JweKeyManagementAlgorithm
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 class AstreaClientJsonAdapter @JsonCreator constructor() {
 
     @get:JsonProperty("client_id") var id: String = ""
     @get:JsonProperty("client_name") var clientName: String = ""
-    @get:JsonProperty("client_type") var clientType: String = ""
+    @get:JsonProperty("client_type") var clientType: String = ClientType.confidential
     @get:JsonProperty("redirect_uris") var redirectUris: Set<String> = emptySet()
     @get:JsonProperty("response_types") var responseTypes: Set<String> = emptySet()
     @get:JsonProperty("grant_types") var grantTypes: Set<String> = emptySet()
     @get:JsonProperty("scopes") var scopes: Set<String> = emptySet()
-    @get:JsonProperty("application_type") var applicationType: String = ""
+    @get:JsonProperty("application_type") var applicationType: String = ApplicationType.web
     @get:JsonProperty("contacts") var contacts: LinkedHashSet<String> = LinkedHashSet()
     @get:JsonProperty("logo_uri") var logoUri: String = ""
     @get:JsonProperty("client_uri") var clientUri: String = ""
@@ -26,17 +32,17 @@ class AstreaClientJsonAdapter @JsonCreator constructor() {
     @get:JsonProperty("jwks") var jwks: String = ""
     @get:JsonProperty("sector_identifier_uri") var sectorIdentifierUri: String = ""
     @get:JsonProperty("subject_type") var subjectType: String = ""
-    @get:JsonProperty("id_token_signed_response_alg") var idTokenSignedResponseAlg: String = ""
-    @get:JsonProperty("id_token_encrypted_response_alg") var idTokenEncryptedResponseAlg: String = ""
-    @get:JsonProperty("id_token_encrypted_response_enc") var idTokenEncryptedResponseEnc: String = ""
-    @get:JsonProperty("request_object_signing_alg") var requestObjectSigningAlg: String = ""
-    @get:JsonProperty("request_object_encryption_alg") var requestObjectEncryptionAlg: String = ""
-    @get:JsonProperty("request_object_encryption_enc") var requestObjectEncryptionEnc: String = ""
-    @get:JsonProperty("userinfo_signed_response_alg") var userinfoSignedResponseAlg: String = ""
-    @get:JsonProperty("userinfo_encrypted_response_alg") var userinfoEncryptedResponseAlg: String = ""
-    @get:JsonProperty("userinfo_encrypted_response_enc") var userinfoEncryptedResponseEnc: String = ""
-    @get:JsonProperty("token_endpoint_auth_method") var tokenEndpointAuthMethod: String = ""
-    @get:JsonProperty("token_endpoint_auth_signing_alg") var tokenEndpointAuthenticationSigningAlg: String = ""
+    @get:JsonProperty("id_token_signed_response_alg") var idTokenSignedResponseAlg: String = JwtSigningAlgorithm.RS256.spec
+    @get:JsonProperty("id_token_encrypted_response_alg") var idTokenEncryptedResponseAlg: String = JweKeyManagementAlgorithm.None.spec
+    @get:JsonProperty("id_token_encrypted_response_enc") var idTokenEncryptedResponseEnc: String = JweContentEncodingAlgorithm.None.spec
+    @get:JsonProperty("request_object_signing_alg") var requestObjectSigningAlg: String = JwtSigningAlgorithm.RS256.spec
+    @get:JsonProperty("request_object_encryption_alg") var requestObjectEncryptionAlg: String = JweKeyManagementAlgorithm.None.spec
+    @get:JsonProperty("request_object_encryption_enc") var requestObjectEncryptionEnc: String = JweContentEncodingAlgorithm.None.spec
+    @get:JsonProperty("userinfo_signed_response_alg") var userinfoSignedResponseAlg: String = JwtSigningAlgorithm.None.spec
+    @get:JsonProperty("userinfo_encrypted_response_alg") var userinfoEncryptedResponseAlg: String = JweKeyManagementAlgorithm.None.spec
+    @get:JsonProperty("userinfo_encrypted_response_enc") var userinfoEncryptedResponseEnc: String = JweContentEncodingAlgorithm.None.spec
+    @get:JsonProperty("token_endpoint_auth_method") var tokenEndpointAuthMethod: String = AuthenticationMethod.clientSecretBasic
+    @get:JsonProperty("token_endpoint_auth_signing_alg") var tokenEndpointAuthenticationSigningAlg: String = JwtSigningAlgorithm.None.spec
     @get:JsonProperty("default_max_age") var defaultMaxAge: Long = 0
     @get:JsonProperty("require_auth_time") var requireAuthTime: Boolean = false
     @get:JsonProperty("default_acr_values") var defaultAcrValues: List<String> = emptyList()

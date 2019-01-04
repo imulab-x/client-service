@@ -66,7 +66,7 @@ class JsonTest : WordSpec({
 
     "Sample client foo" should {
         "Serialize to JSON properly" {
-            val json = mapper.writeValueAsString(AstreaClientJsonAdapter(SampleClients.foo))
+            val json = mapper.writeValueAsString(AstreaClientJsonAdapter(SampleClients.foo()))
             JSONAssert.assertEquals(fooJson, json, false)
         }
     }
@@ -75,7 +75,7 @@ class JsonTest : WordSpec({
         "Deserialize to JSON properly" {
             val foo: AstreaClient = mapper.readValue<AstreaClientJsonAdapter>(fooJson).toDefaultClient()
 
-            foo compareWith SampleClients.foo
+            foo compareWith SampleClients.foo()
             foo.secret shouldBe ByteArray(0)
         }
     }

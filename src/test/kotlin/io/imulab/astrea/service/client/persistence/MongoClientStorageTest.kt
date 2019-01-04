@@ -34,7 +34,7 @@ class MongoClientStorageTest : FeatureSpec() {
         feature("storage") {
             checkNotNull(mongoCollection)
             val storage = MongoClientStorage(mongoCollection!!)
-            val sample = SampleClients.foo
+            val sample = SampleClients.foo()
 
             scenario("should be able to insert a client") {
                 val result = runCatching {

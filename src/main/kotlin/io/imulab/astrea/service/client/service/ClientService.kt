@@ -1,12 +1,16 @@
 package io.imulab.astrea.service.client.service
 
+import io.imulab.astrea.sdk.client.AstreaClient
 import io.imulab.astrea.sdk.client.DefaultClient
 import io.imulab.astrea.sdk.oauth.client.pwd.PasswordEncoder
 import io.imulab.astrea.sdk.oauth.error.InvalidRequest
+import io.imulab.astrea.sdk.oauth.error.OAuthException
 import io.imulab.astrea.sdk.oauth.error.ServerError
 import io.imulab.astrea.sdk.oauth.reserved.AuthenticationMethod
 import io.imulab.astrea.sdk.oauth.reserved.GrantType
+import io.imulab.astrea.sdk.oauth.reserved.Param
 import io.imulab.astrea.sdk.oauth.reserved.ResponseType
+import io.imulab.astrea.sdk.oidc.discovery.Discovery
 import io.imulab.astrea.sdk.oidc.reserved.JweContentEncodingAlgorithm
 import io.imulab.astrea.sdk.oidc.reserved.JweKeyManagementAlgorithm
 import io.imulab.astrea.service.client.persistence.ClientStorage
@@ -23,10 +27,13 @@ import java.util.*
 class ClientService(
     private val clientStorage: ClientStorage,
     private val passwordEncoder: PasswordEncoder,
+    private val discovery: Discovery,
     private val okHttpClient: OkHttpClient
 ) {
 
     private val logger = LoggerFactory.getLogger(ClientService::class.java)
+
+    val encryptionAlgNonParityError = InvalidRequest.unmet("Encryption algorithm and encoding must be both provided or both none.")
 
     /**
      * Creates a client and returns its initial plain text secret, if any.
@@ -45,6 +52,8 @@ class ClientService(
         ensureAlgorithmParity(client.idTokenEncryptedResponseAlgorithm, client.idTokenEncryptedResponseEncoding)
         ensureAlgorithmParity(client.requestObjectEncryptionAlgorithm, client.requestObjectEncryptionEncoding)
         ensureAlgorithmParity(client.userInfoEncryptedResponseAlgorithm, client.userInfoEncryptedResponseEncoding)
+
+        ensureSupported(client)
 
         val secret = when (client.tokenEndpointAuthMethod) {
             AuthenticationMethod.clientSecretBasic,
@@ -82,6 +91,8 @@ class ClientService(
         ensureAlgorithmParity(update.idTokenEncryptedResponseAlgorithm, update.idTokenEncryptedResponseEncoding)
         ensureAlgorithmParity(update.requestObjectEncryptionAlgorithm, update.requestObjectEncryptionEncoding)
         ensureAlgorithmParity(update.userInfoEncryptedResponseAlgorithm, update.userInfoEncryptedResponseEncoding)
+
+        ensureSupported(update)
 
         if (update.jwksUri != original.jwksUri && original.jwksUri.isNotEmpty())
             update.jwks = this.resolveJwks(update.jwksUri, update.jwks)
@@ -155,7 +166,50 @@ class ClientService(
         val k = if (alg == JweKeyManagementAlgorithm.None) 0 else 1
         val e = if (enc == JweContentEncodingAlgorithm.None) 0 else 1
         if (k + e == 1)
-            throw InvalidRequest.unmet("Encryption algorithm and encoding must be both provided or both none.")
+            throw encryptionAlgNonParityError
+    }
+
+    private fun ensureSupported(client: AstreaClient) {
+        val unsupported: (String) -> Throwable = { param ->
+            OAuthException(InvalidRequest.status, InvalidRequest.code, "Value for parameter $param is unsupported.")
+        }
+
+        // non-exhaustive list of support checks.
+        // --------------------------------------
+        // some checks are left to be performed at request time (i.e. request_uris).
+        // some other checks are relaxed due to its non-exhaustive nature (i.e. scopes)
+        with(discovery) {
+            when {
+                !responseTypesSupported.containsAll(client.responseTypes) ->
+                    throw unsupported(Param.responseType)
+                !grantTypesSupported.containsAll(client.grantTypes) ->
+                    throw unsupported(Param.grantType)
+                !idTokenSigningAlgorithmValuesSupported.contains(client.idTokenSignedResponseAlgorithm.spec) ->
+                    throw unsupported("id_token_signed_response_alg")
+                !idTokenEncryptionAlgorithmValuesSupported.contains(client.idTokenEncryptedResponseAlgorithm.spec) ->
+                    throw unsupported("id_token_encrypted_response_alg")
+                !idTokenEncryptionEncodingValuesSupported.contains(client.idTokenEncryptedResponseEncoding.spec) ->
+                    throw unsupported("id_token_encrypted_response_enc")
+                !requestObjectSigningAlgorithmValuesSupported.contains(client.requestObjectSigningAlgorithm.spec) ->
+                    throw unsupported("request_object_signing_alg")
+                !requestObjectEncryptionAlgorithmValuesSupported.contains(client.requestObjectEncryptionAlgorithm.spec) ->
+                    throw unsupported("request_object_encryption_alg")
+                !requestObjectEncryptionEncodingValuesSupported.contains(client.requestObjectEncryptionEncoding.spec) ->
+                    throw unsupported("request_object_encryption_enc")
+                !userInfoSigningAlgorithmValuesSupported.contains(client.userInfoSignedResponseAlgorithm.spec) ->
+                    throw unsupported("userinfo_signed_response_alg")
+                !userInfoEncryptionAlgorithmValuesSupported.contains(client.userInfoEncryptedResponseAlgorithm.spec) ->
+                    throw unsupported("userinfo_encrypted_response_alg")
+                !userInfoEncryptionEncodingValuesSupported.contains(client.userInfoEncryptedResponseEncoding.spec) ->
+                    throw unsupported("userinfo_encrypted_response_enc")
+                !tokenEndpointAuthenticationMethodsSupported.contains(client.tokenEndpointAuthenticationMethod) ->
+                    throw unsupported("token_endpoint_auth_method")
+                !tokenEndpointAuthenticationSigningAlgorithmValuesSupported.contains(client.tokenEndpointAuthenticationSigningAlgorithm.spec) ->
+                    throw unsupported("token_endpoint_auth_signing_alg")
+                else -> {}
+            }
+        }
+
     }
 
     private fun String.withDefault(value: String): String = if (isEmpty()) value else this
