@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.imulab.astrea.sdk.client.AstreaClient
 import io.imulab.astrea.sdk.client.SampleClients
-import io.kotlintest.matchers.collections.shouldContainAll
+import io.imulab.astrea.service.client.compareWith
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
 import org.skyscreamer.jsonassert.JSONAssert
@@ -74,41 +74,8 @@ class JsonTest : WordSpec({
     "JSON of sample client foo" should {
         "Deserialize to JSON properly" {
             val foo: AstreaClient = mapper.readValue<AstreaClientJsonAdapter>(fooJson).toDefaultClient()
-            val expect: AstreaClient = SampleClients.foo
 
-            infix operator fun String.invoke(expect: String) { this shouldBe expect }
-            infix operator fun Long.invoke(expect: Long) { this shouldBe expect }
-            infix operator fun Boolean.invoke(expect: Boolean) { this shouldBe expect }
-            infix operator fun Collection<*>.invoke(expect: Collection<*>) { this shouldContainAll expect }
-
-            foo.id(expect.id)
-            foo.name(expect.name)
-            foo.type(expect.type)
-            foo.redirectUris(expect.redirectUris)
-            foo.responseTypes(expect.responseTypes)
-            foo.grantTypes(expect.grantTypes)
-            foo.scopes(expect.scopes)
-            foo.applicationType(expect.applicationType)
-            foo.contacts(expect.contacts)
-            foo.logoUri(expect.logoUri)
-            foo.clientUri(expect.clientUri)
-            foo.policyUri(expect.policyUri)
-            foo.tosUri(expect.tosUri)
-            foo.subjectType(expect.subjectType)
-            foo.idTokenSignedResponseAlgorithm.spec(expect.idTokenSignedResponseAlgorithm.spec)
-            foo.idTokenEncryptedResponseAlgorithm.spec(expect.idTokenEncryptedResponseAlgorithm.spec)
-            foo.idTokenEncryptedResponseEncoding.spec(expect.idTokenEncryptedResponseEncoding.spec)
-            foo.requestObjectSigningAlgorithm.spec(expect.requestObjectSigningAlgorithm.spec)
-            foo.requestObjectEncryptionAlgorithm.spec(expect.requestObjectEncryptionAlgorithm.spec)
-            foo.requestObjectEncryptionEncoding.spec(expect.requestObjectEncryptionEncoding.spec)
-            foo.userInfoSignedResponseAlgorithm.spec(expect.userInfoSignedResponseAlgorithm.spec)
-            foo.userInfoEncryptedResponseAlgorithm.spec(expect.userInfoEncryptedResponseAlgorithm.spec)
-            foo.userInfoEncryptedResponseEncoding.spec(expect.userInfoEncryptedResponseEncoding.spec)
-            foo.tokenEndpointAuthenticationMethod(expect.tokenEndpointAuthenticationMethod)
-            foo.tokenEndpointAuthenticationSigningAlgorithm.spec(expect.tokenEndpointAuthenticationSigningAlgorithm.spec)
-            foo.defaultMaxAge(expect.defaultMaxAge)
-            foo.requireAuthTime(expect.requireAuthTime)
-
+            foo compareWith SampleClients.foo
             foo.secret shouldBe ByteArray(0)
         }
     }
