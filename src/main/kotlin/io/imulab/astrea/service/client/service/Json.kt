@@ -1,81 +1,83 @@
 package io.imulab.astrea.service.client.service
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.imulab.astrea.sdk.client.AstreaClient
 import io.imulab.astrea.sdk.client.DefaultClient
-import java.util.*
 
-class AstreaClientJsonAdapter(
-    @JsonProperty("client_id") var id: String,
-    @JsonProperty("client_name") var clientName: String,
-    @JsonProperty("client_type") var clientType: String,
-    @JsonProperty("redirect_uris") var redirectUris: Set<String>,
-    @JsonProperty("response_types") var responseTypes: Set<String>,
-    @JsonProperty("grant_types") var grantTypes: Set<String>,
-    @JsonProperty("scopes") var scopes: Set<String>,
-    @JsonProperty("application_type") var applicationType: String,
-    @JsonProperty("contacts") var contacts: LinkedHashSet<String>,
-    @JsonProperty("logo_uri") var logoUri: String,
-    @JsonProperty("client_uri") var clientUri: String,
-    @JsonProperty("policy_uri") var policyUri: String,
-    @JsonProperty("tos_uri") var tosUri: String,
-    @JsonProperty("jwks_uri") var jwksUri: String,
-    @JsonProperty("jwks") var jwks: String,
-    @JsonProperty("sector_identifier_uri") var sectorIdentifierUri: String,
-    @JsonProperty("subject_type") var subjectType: String,
-    @JsonProperty("id_token_signed_response_alg") var idTokenSignedResponseAlg: String,
-    @JsonProperty("id_token_encrypted_response_alg") var idTokenEncryptedResponseAlg: String,
-    @JsonProperty("id_token_encrypted_response_enc") var idTokenEncryptedResponseEnc: String,
-    @JsonProperty("request_object_signing_alg") var requestObjectSigningAlg: String,
-    @JsonProperty("request_object_encryption_alg") var requestObjectEncryptionAlg: String,
-    @JsonProperty("request_object_encryption_enc") var requestObjectEncryptionEnc: String,
-    @JsonProperty("userinfo_signed_response_alg") var userinfoSignedResponseAlg: String,
-    @JsonProperty("userinfo_encrypted_response_alg") var userinfoEncryptedResponseAlg: String,
-    @JsonProperty("userinfo_encrypted_response_enc") var userinfoEncryptedResponseEnc: String,
-    @JsonProperty("token_endpoint_auth_method") var tokenEndpointAuthMethod: String,
-    @JsonProperty("token_endpoint_auth_signing_alg") var tokenEndpointAuthenticationSigningAlg: String,
-    @JsonProperty("default_max_age") var defaultMaxAge: Long,
-    @JsonProperty("require_auth_time") var requireAuthTime: Boolean,
-    @JsonProperty("default_acr_values") var defaultAcrValues: List<String>,
-    @JsonProperty("initiate_login_uri") var initiateLoginUri: String,
-    @JsonProperty("request_uris") var requestUris: List<String>
-) {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+class AstreaClientJsonAdapter @JsonCreator constructor() {
 
-    constructor(client: AstreaClient) : this(
-        id = client.id,
-        clientName = client.name,
-        clientType = client.type,
-        redirectUris = client.redirectUris,
-        responseTypes = client.responseTypes,
-        grantTypes = client.grantTypes,
-        scopes = client.scopes,
-        applicationType = client.applicationType,
-        contacts = client.contacts,
-        logoUri = client.logoUri,
-        clientUri = client.clientUri,
-        policyUri = client.policyUri,
-        tosUri = client.tosUri,
-        jwksUri = client.jwksUri,
-        jwks = if (client.jwksUri.isEmpty()) client.jwks else "",
-        sectorIdentifierUri = client.sectorIdentifierUri,
-        subjectType = client.subjectType,
-        idTokenSignedResponseAlg = client.idTokenSignedResponseAlgorithm.spec,
-        idTokenEncryptedResponseAlg = client.idTokenEncryptedResponseAlgorithm.spec,
-        idTokenEncryptedResponseEnc = client.idTokenEncryptedResponseEncoding.spec,
-        requestObjectSigningAlg = client.requestObjectSigningAlgorithm.spec,
-        requestObjectEncryptionAlg = client.requestObjectEncryptionAlgorithm.spec,
-        requestObjectEncryptionEnc = client.requestObjectEncryptionEncoding.spec,
-        userinfoSignedResponseAlg = client.userInfoSignedResponseAlgorithm.spec,
-        userinfoEncryptedResponseAlg = client.userInfoEncryptedResponseAlgorithm.spec,
-        userinfoEncryptedResponseEnc = client.userInfoEncryptedResponseEncoding.spec,
-        tokenEndpointAuthMethod = client.tokenEndpointAuthenticationMethod,
-        tokenEndpointAuthenticationSigningAlg = client.tokenEndpointAuthenticationSigningAlgorithm.spec,
-        defaultMaxAge = client.defaultMaxAge,
-        requireAuthTime = client.requireAuthTime,
-        defaultAcrValues = client.defaultAcrValues,
-        initiateLoginUri = client.initiateLoginUri,
+    @get:JsonProperty("client_id") var id: String = ""
+    @get:JsonProperty("client_name") var clientName: String = ""
+    @get:JsonProperty("client_type") var clientType: String = ""
+    @get:JsonProperty("redirect_uris") var redirectUris: Set<String> = emptySet()
+    @get:JsonProperty("response_types") var responseTypes: Set<String> = emptySet()
+    @get:JsonProperty("grant_types") var grantTypes: Set<String> = emptySet()
+    @get:JsonProperty("scopes") var scopes: Set<String> = emptySet()
+    @get:JsonProperty("application_type") var applicationType: String = ""
+    @get:JsonProperty("contacts") var contacts: LinkedHashSet<String> = LinkedHashSet()
+    @get:JsonProperty("logo_uri") var logoUri: String = ""
+    @get:JsonProperty("client_uri") var clientUri: String = ""
+    @get:JsonProperty("policy_uri") var policyUri: String = ""
+    @get:JsonProperty("tos_uri") var tosUri: String = ""
+    @get:JsonProperty("jwks_uri") var jwksUri: String = ""
+    @get:JsonProperty("jwks") var jwks: String = ""
+    @get:JsonProperty("sector_identifier_uri") var sectorIdentifierUri: String = ""
+    @get:JsonProperty("subject_type") var subjectType: String = ""
+    @get:JsonProperty("id_token_signed_response_alg") var idTokenSignedResponseAlg: String = ""
+    @get:JsonProperty("id_token_encrypted_response_alg") var idTokenEncryptedResponseAlg: String = ""
+    @get:JsonProperty("id_token_encrypted_response_enc") var idTokenEncryptedResponseEnc: String = ""
+    @get:JsonProperty("request_object_signing_alg") var requestObjectSigningAlg: String = ""
+    @get:JsonProperty("request_object_encryption_alg") var requestObjectEncryptionAlg: String = ""
+    @get:JsonProperty("request_object_encryption_enc") var requestObjectEncryptionEnc: String = ""
+    @get:JsonProperty("userinfo_signed_response_alg") var userinfoSignedResponseAlg: String = ""
+    @get:JsonProperty("userinfo_encrypted_response_alg") var userinfoEncryptedResponseAlg: String = ""
+    @get:JsonProperty("userinfo_encrypted_response_enc") var userinfoEncryptedResponseEnc: String = ""
+    @get:JsonProperty("token_endpoint_auth_method") var tokenEndpointAuthMethod: String = ""
+    @get:JsonProperty("token_endpoint_auth_signing_alg") var tokenEndpointAuthenticationSigningAlg: String = ""
+    @get:JsonProperty("default_max_age") var defaultMaxAge: Long = 0
+    @get:JsonProperty("require_auth_time") var requireAuthTime: Boolean = false
+    @get:JsonProperty("default_acr_values") var defaultAcrValues: List<String> = emptyList()
+    @get:JsonProperty("initiate_login_uri") var initiateLoginUri: String = ""
+    @get:JsonProperty("request_uris") var requestUris: List<String> = emptyList()
+
+    constructor(client: AstreaClient) : this() {
+        id = client.id
+        clientName = client.name
+        clientType = client.type
+        redirectUris = client.redirectUris
+        responseTypes = client.responseTypes
+        grantTypes = client.grantTypes
+        scopes = client.scopes
+        applicationType = client.applicationType
+        contacts = client.contacts
+        logoUri = client.logoUri
+        clientUri = client.clientUri
+        policyUri = client.policyUri
+        tosUri = client.tosUri
+        jwksUri = client.jwksUri
+        jwks = if (client.jwksUri.isEmpty()) client.jwks else ""
+        sectorIdentifierUri = client.sectorIdentifierUri
+        subjectType = client.subjectType
+        idTokenSignedResponseAlg = client.idTokenSignedResponseAlgorithm.spec
+        idTokenEncryptedResponseAlg = client.idTokenEncryptedResponseAlgorithm.spec
+        idTokenEncryptedResponseEnc = client.idTokenEncryptedResponseEncoding.spec
+        requestObjectSigningAlg = client.requestObjectSigningAlgorithm.spec
+        requestObjectEncryptionAlg = client.requestObjectEncryptionAlgorithm.spec
+        requestObjectEncryptionEnc = client.requestObjectEncryptionEncoding.spec
+        userinfoSignedResponseAlg = client.userInfoSignedResponseAlgorithm.spec
+        userinfoEncryptedResponseAlg = client.userInfoEncryptedResponseAlgorithm.spec
+        userinfoEncryptedResponseEnc = client.userInfoEncryptedResponseEncoding.spec
+        tokenEndpointAuthMethod = client.tokenEndpointAuthenticationMethod
+        tokenEndpointAuthenticationSigningAlg = client.tokenEndpointAuthenticationSigningAlgorithm.spec
+        defaultMaxAge = client.defaultMaxAge
+        requireAuthTime = client.requireAuthTime
+        defaultAcrValues = client.defaultAcrValues
+        initiateLoginUri = client.initiateLoginUri
         requestUris = client.requestUris
-    )
+    }
 
     fun toDefaultClient(): DefaultClient =
         DefaultClient(
