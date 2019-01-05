@@ -11,17 +11,11 @@ steps:
       channel: client-service
       template: >
         Build {{build.number}} started at {{build.started}}. View it at {{build.link}}
-  - name: "unit test"
+  - name: "test, package"
     image: davidiamyou/open-jdk-8:latest
     commands:
       - ./gradlew test -Dkotlintest.tags.include=Unit
-  - name: "local integration test"
-    image: davidiamyou/open-jdk-8:latest
-    commands:
       - ./gradlew test -Dkotlintest.tags.include=Integration
-  - name: "package"
-    image: davidiamyou/open-jdk-8:latest
-    commands:
       - ./gradlew shadowJar
       - printf "latest," > .tags
       - ./gradlew properties -q | grep "version:" | awk '{print $2}' | cat >> .tags
