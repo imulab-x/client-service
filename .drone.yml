@@ -15,7 +15,6 @@ steps:
     image: davidiamyou/open-jdk-8:latest
     commands:
       - ./gradlew test -Dkotlintest.tags.include=Unit
-      - ./gradlew build
   - name: "local integration test"
     image: davidiamyou/open-jdk-8:latest
     commands:
