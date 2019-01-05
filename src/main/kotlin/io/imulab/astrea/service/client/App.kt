@@ -96,13 +96,16 @@ open class App(vertx: Vertx, config: Config) {
     val health = Kodein.Module("health") {
         bind<HealthCheckHandler>() with singleton {
             HealthCheckHandler.create(vertx).apply {
-                register("mongodb") { h ->
-                    try {
-                        instance<MongoDatabase>().runCommand(BasicDBObject("ping", "1"))
-                        h.complete(Status.OK())
-                    } catch (t: Throwable) {
-                        h.complete(Status.KO())
-                    }
+                register("mongodb", 2000) { h ->
+                    vertx.executeBlocking<Document>({ f ->
+                        val doc = instance<MongoDatabase>().runCommand(BasicDBObject("ping", "1"))
+                        f.complete(doc)
+                    }, { ar ->
+                        if (ar.succeeded())
+                            h.complete(Status.OK())
+                        else
+                            h.complete(Status.KO())
+                    })
                 }
             }
         }
