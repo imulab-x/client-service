@@ -12,7 +12,6 @@ import de.flapdoodle.embed.process.runtime.Network
 import org.bson.Document
 import java.util.concurrent.locks.ReentrantLock
 
-
 object EmbeddedMongo {
 
     private val lock = ReentrantLock()

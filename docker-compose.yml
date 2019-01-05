@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  mongodb:
+    image: "bitnami/mongodb:latest"
+    ports:
+      - "32768:27017"
+    volumes:
+      - "astrea-local-mongodb-data:/bitnami"
+  client-service:
+    build: .
+    expose:
+      - 8080
+      - 35027
+    depends_on:
+      - mongodb
+    ports:
+      - "18001:8080"
+      - "35027:35027"
+    environment:
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DB=client
+      - MONGO_COLLECTION=client
+      - DISCOVERY_USE_SAMPLE=true
+      - SERVICE_REST_PORT=8080
+      - SERVICE_GRPC_PORT=35027
+
+volumes:
+  astrea-local-mongodb-data:

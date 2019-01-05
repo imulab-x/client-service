@@ -54,7 +54,7 @@ class ClientGrpcApi(
             }
         }
 
-        healthCheckHandler.register("ClientGRPC") { h ->
+        healthCheckHandler.register("client_grpc_api") { h ->
             if (server.isTerminated)
                 h.complete(Status.KO())
             else

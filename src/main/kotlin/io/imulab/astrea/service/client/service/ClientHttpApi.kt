@@ -3,7 +3,6 @@ package io.imulab.astrea.service.client.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.typesafe.config.Config
-import io.imulab.astrea.sdk.client.DefaultClient
 import io.imulab.astrea.sdk.oauth.error.InvalidRequest
 import io.imulab.astrea.sdk.oauth.error.OAuthException
 import io.imulab.astrea.sdk.oauth.error.ServerError
