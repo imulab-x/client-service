@@ -11,11 +11,18 @@ steps:
       channel: client-service
       template: >
         Build {{build.number}} started at {{build.started}}. View it at {{build.link}}
-  - name: "unit, build, package, publish"
+  - name: "unit test"
     image: davidiamyou/open-jdk-8:latest
     commands:
-      - ./gradlew test
+      - ./gradlew test -Dkotlintest.tags.include=Unit
       - ./gradlew build
+  - name: "local integration test"
+    image: davidiamyou/open-jdk-8:latest
+    commands:
+      - ./gradlew test -Dkotlintest.tags.include=Integration
+  - name: "package"
+    image: davidiamyou/open-jdk-8:latest
+    commands:
       - ./gradlew shadowJar
       - printf "latest," > .tags
       - ./gradlew properties -q | grep "version:" | awk '{print $2}' | cat >> .tags
@@ -25,7 +32,7 @@ steps:
       repo: registry.imulab.io/astrea/client-service
       registry: registry.imulab.io
       insecure: true
-  - name: "notify"
+  - name: "notify result"
     image: plugins/slack
     settings:
       webhook:

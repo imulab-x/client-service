@@ -4,15 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.imulab.astrea.sdk.client.AstreaClient
 import io.imulab.astrea.sdk.client.SampleClients
+import io.imulab.astrea.service.client.Unit
 import io.imulab.astrea.service.client.compareWith
+import io.kotlintest.Tag
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
 import org.skyscreamer.jsonassert.JSONAssert
 
-class JsonTest : WordSpec({
+class JsonTest : WordSpec() {
 
-    val mapper = ObjectMapper()
-    val fooJson = """
+    override fun tags(): Set<Tag> = setOf(Unit)
+
+    init {
+        val mapper = ObjectMapper()
+        val fooJson = """
         {
            "client_id":"foo",
            "client_name":"Foo",
@@ -64,19 +69,20 @@ class JsonTest : WordSpec({
         }
     """.trimIndent()
 
-    "Sample client foo" should {
-        "Serialize to JSON properly" {
-            val json = mapper.writeValueAsString(AstreaClientJsonAdapter(SampleClients.foo()))
-            JSONAssert.assertEquals(fooJson, json, false)
+        "Sample client foo" should {
+            "Serialize to JSON properly" {
+                val json = mapper.writeValueAsString(AstreaClientJsonAdapter(SampleClients.foo()))
+                JSONAssert.assertEquals(fooJson, json, false)
+            }
+        }
+
+        "JSON of sample client foo" should {
+            "Deserialize to JSON properly" {
+                val foo: AstreaClient = mapper.readValue<AstreaClientJsonAdapter>(fooJson).toDefaultClient()
+
+                foo compareWith SampleClients.foo()
+                foo.secret shouldBe ByteArray(0)
+            }
         }
     }
-
-    "JSON of sample client foo" should {
-        "Deserialize to JSON properly" {
-            val foo: AstreaClient = mapper.readValue<AstreaClientJsonAdapter>(fooJson).toDefaultClient()
-
-            foo compareWith SampleClients.foo()
-            foo.secret shouldBe ByteArray(0)
-        }
-    }
-})
+}

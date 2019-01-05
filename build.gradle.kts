@@ -47,6 +47,7 @@ tasks {
     }
     test {
         useJUnitPlatform()
+        systemProperties = System.getProperties().map { it.key.toString() to it.value }.toMap()
     }
     shadowJar {
         classifier = ""

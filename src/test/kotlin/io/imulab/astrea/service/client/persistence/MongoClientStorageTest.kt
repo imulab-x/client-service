@@ -3,13 +3,11 @@ package io.imulab.astrea.service.client.persistence
 import com.mongodb.client.MongoCollection
 import io.imulab.astrea.sdk.client.SampleClients
 import io.imulab.astrea.sdk.oauth.error.OAuthException
+import io.imulab.astrea.service.client.Integration
 import io.imulab.astrea.service.client.compareWith
-import io.kotlintest.Description
-import io.kotlintest.Spec
+import io.kotlintest.*
 import io.kotlintest.extensions.TestListener
 import io.kotlintest.matchers.collections.shouldContain
-import io.kotlintest.should
-import io.kotlintest.shouldBe
 import io.kotlintest.specs.FeatureSpec
 import kotlinx.coroutines.runBlocking
 import org.bson.Document
@@ -29,6 +27,8 @@ class MongoClientStorageTest : FeatureSpec() {
             }
         }
     )
+
+    override fun tags(): Set<Tag> = setOf(Integration)
 
     init {
         feature("storage") {
