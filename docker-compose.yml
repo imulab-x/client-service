@@ -7,6 +7,12 @@ services:
       - "32768:27017"
     volumes:
       - "astrea-local-mongodb-data:/bitnami"
+  zookeeper:
+    image: "bitnami/zookeeper:latest"
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
   client-service:
     build: .
     expose:

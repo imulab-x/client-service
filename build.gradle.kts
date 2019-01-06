@@ -58,7 +58,7 @@ tasks {
 }
 
 dependencies {
-    implementation(platform("io.imulab.x:astrea-dependencies:6"))
+    implementation(platform("io.imulab.x:astrea-dependencies:7"))
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("io.imulab.x:astrea-commons:0.2.4")
@@ -69,6 +69,7 @@ dependencies {
     implementation("io.vertx:vertx-lang-kotlin-coroutines")
     implementation("io.vertx:vertx-grpc")
     implementation("io.vertx:vertx-health-check")
+    implementation("io.vertx:vertx-zookeeper")
     implementation("org.kodein.di:kodein-di-generic-jvm")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.typesafe:config")

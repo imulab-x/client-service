@@ -17,6 +17,7 @@ import io.vertx.ext.web.api.contract.RouterFactoryOptions
 import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory
 import io.vertx.ext.web.api.validation.ValidationException
 import io.vertx.kotlin.core.http.listenAwait
+import io.vertx.kotlin.core.json.JsonObject
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 import io.vertx.kotlin.coroutines.CoroutineVerticle
@@ -45,9 +46,13 @@ class ClientHttpApi(
 
             addFailureHandlerByOperationId("client.create", this@ClientHttpApi::errorHandler)
             addFailureHandlerByOperationId("client.read", this@ClientHttpApi::errorHandler)
+            addFailureHandlerByOperationId("client.delete", this@ClientHttpApi::errorHandler)
+            addFailureHandlerByOperationId("client.update", this@ClientHttpApi::errorHandler)
 
             addSuspendHandlerByOperationId("client.create", this@ClientHttpApi::createClient)
             addSuspendHandlerByOperationId("client.read", this@ClientHttpApi::getClient)
+            addSuspendHandlerByOperationId("client.delete", this@ClientHttpApi::deleteClient)
+            addSuspendHandlerByOperationId("client.update", this@ClientHttpApi::updateClient)
         }.router
 
         router.get("/health").handler(healthCheckHandler)
@@ -64,6 +69,8 @@ class ClientHttpApi(
         val client = apiMapper.readValue<AstreaClientJsonAdapter>(rc.bodyAsString).toDefaultClient()
         val plainSecret = clientService.createClient(client)
 
+        // todo: issue access token
+
         rc.response().setStatusCode(201).applicationJson {
             json {
                 val fields = mutableListOf(
@@ -77,6 +84,31 @@ class ClientHttpApi(
                 obj(*fields.toTypedArray())
             }
         }
+
+        vertx.eventBus().publish("client.created", JsonObject("id" to client.id))
+    }
+
+    private suspend fun updateClient(rc: RoutingContext) {
+        val id = rc.pathParam("clientId")
+        val update = apiMapper.readValue<AstreaClientJsonAdapter>(rc.bodyAsString).toDefaultClient()
+
+        // todo check authorization
+
+        clientService.updateClient(id, update)
+        rc.response().setStatusCode(204).end()
+
+        vertx.eventBus().publish("client.updated", JsonObject("id" to id))
+    }
+
+    private suspend fun deleteClient(rc: RoutingContext) {
+        val id = rc.pathParam("clientId")
+
+        // todo check authorization
+
+        clientStorage.delete(id)
+        rc.response().setStatusCode(204).end()
+
+        vertx.eventBus().publish("client.deleted", JsonObject("id" to id))
     }
 
     private suspend fun getClient(rc: RoutingContext) {

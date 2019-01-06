@@ -6,9 +6,9 @@
         </Console>
     </Appenders>
     <Loggers>
-        <!--<Logger name="io.imulab.astrea" level="debug">-->
-            <!--<AppenderRef ref="Console"/>-->
-        <!--</Logger>-->
+        <Logger name="org.apache.zookeeper.level" level="info">
+            <AppenderRef ref="Console"/>
+        </Logger>
         <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>
